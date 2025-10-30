@@ -11,6 +11,13 @@ export function tasksApi() {
       if (!taskTypeId || !questId) throw new Error('taskType and quest are required')
       const fv = Number(finalValue ?? value) || 0
       if (picture) {
+        try {
+          console.debug('[tasksApi] picture:', {
+            name: picture?.name,
+            type: picture?.type,
+            size: picture?.size,
+          })
+        } catch {}
         const fd = new FormData()
         fd.append('description', description ?? '')
         fd.append('finalValue', String(fv))
@@ -19,7 +26,8 @@ export function tasksApi() {
         fd.append('comment', comment ?? '')
         fd.append('taskType', taskTypeId)
         fd.append('quest', questId)
-        fd.append('picture', picture)
+        const fname = picture?.name || (picture?.type === 'image/png' ? 'photo.png' : 'photo.jpg')
+        fd.append('picture', picture, fname)
         return pb.create(col, fd)
       }
       return pb.create(col, {

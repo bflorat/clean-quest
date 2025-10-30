@@ -48,6 +48,11 @@ If you serve the frontend on http://localhost:5173, add that origin to PocketBas
 - `src/services/pbData.js` — helpers to list quests and task types
 - `src/test/*` — Vitest + Testing Library setup and tests
 
+## Business rules
+
+- Task value fallback: when a task `finalValue` (or `value`) is missing or equal to 0, the UI uses its associated task type `defaultValue` for display and for the Estimated Money total.
+- Rules fallback: when the current quest has an empty `rules` field, the UI looks back through previous quests (sorted by start date descending) and shows the first non‑empty `rules` it finds. If none exist, it displays “No rules yet.”
+
 ## Node version
 
 Use Node 18+.
@@ -147,11 +152,6 @@ docker compose run --rm pocketbase migrate up
 docker compose run --rm pocketbase migrate down
 ```
 
-The included migration creates collections:
-- `task_types` (unique `taskType`, `defaultValue`, `comment`)
-- `quests` (`start`, `end`, `comment`, `user`→`users`)
-- `tasks` (`description`, `taskType`→`task_types`, `finalValue`, `done`, `doneWithoutAsking`, `comment`, `picture`, `quest`→`quests`)
-- `payments` (`datePayment`, `comment`, `quest`→`quests`, unique on `quest`)
 
 
 # Data model

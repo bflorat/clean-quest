@@ -17,6 +17,7 @@ const messages = {
       total: 'Total',
       hint: 'Mark tasks done to increment earnings.'
     },
+    rules: { title: 'Rules', view: 'View rules', link: 'Rules', empty: 'No rules yet.' },
     board: {
       currentQuest: 'Current Quest',
       noActiveQuest: 'No quest active now. Create one covering the current date in PocketBase.',
@@ -33,9 +34,9 @@ const messages = {
       penalty: 'Penalty'
     },
     value: { aria: 'Value' },
-    actions: { add: 'Add' },
+    actions: { add: 'Add', close: 'Close' },
     fields: { comment: 'Comment (optional)' },
-    media: { takePicture: 'Take picture' },
+    media: { takePicture: 'Take picture', viewPicture: 'View picture', pictureAlt: 'Task picture' },
     loading: { checkingSession: 'Checking session…' },
     footer: { note: 'Requires PocketBase backend and user login.' }
   },
@@ -55,6 +56,7 @@ const messages = {
       total: 'Total',
       hint: 'Marque les tâches faites pour augmenter les gains.'
     },
+    rules: { title: 'Règles', view: 'Voir les règles', link: 'Règles', empty: 'Aucune règle pour le moment.' },
     board: {
       currentQuest: 'Quête en cours',
       noActiveQuest: 'Aucune quête active. Crée une quête couvrant la date actuelle dans PocketBase.',
@@ -71,9 +73,9 @@ const messages = {
       penalty: 'Pénalité'
     },
     value: { aria: 'Valeur' },
-    actions: { add: 'Ajouter' },
+    actions: { add: 'Ajouter', close: 'Fermer' },
     fields: { comment: 'Commentaire (optionnel)' },
-    media: { takePicture: 'Prendre une photo' },
+    media: { takePicture: 'Prendre une photo', viewPicture: 'Voir la photo', pictureAlt: 'Photo de la tâche' },
     loading: { checkingSession: 'Vérification de la session…' },
     footer: {  }
   }

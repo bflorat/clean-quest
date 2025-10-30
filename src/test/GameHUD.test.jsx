@@ -50,4 +50,23 @@ describe('GameHUD estimated money', () => {
     const money = screen.getByLabelText('estimated-money')
     expect(money).toHaveTextContent(`€ ${fmt(expected)}`)
   })
+
+  it('falls back to taskType.defaultValue when finalValue is 0', () => {
+    const types = [
+      { id: 'tt1', taskType: 'A', defaultValue: 5 },
+      { id: 'tt2', taskType: 'B', defaultValue: -2 },
+    ]
+    const tasks = [
+      { id: 'a', description: 'A', finalValue: 0, taskType: 'tt1' },
+      { id: 'b', description: 'B', value: 0, taskType: 'tt2' },
+    ]
+    const expected = 5 + -2
+    render(
+      <I18nProvider>
+        <GameHUD tasks={tasks} types={types} />
+      </I18nProvider>
+    )
+    const money = screen.getByLabelText('estimated-money')
+    expect(money).toHaveTextContent(`€ ${fmt(expected)}`)
+  })
 })

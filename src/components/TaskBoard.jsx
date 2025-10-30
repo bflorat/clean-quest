@@ -7,7 +7,9 @@ import GameHUD from './GameHUD.jsx'
 import { useAuth } from '../auth/AuthContext.jsx'
 import { useI18n } from '../i18n/I18nProvider.jsx'
 import { isDoneWithoutAsking } from '../lib/taskFlags.js'
+import { taskValue, taskValueWithSource, toNumber } from '../lib/taskValue.js'
 import TaskTypeSelect from './TaskTypeSelect.jsx'
+import { fileUrl } from '../services/pb.js'
 
 export default function TaskBoard() {
   const api = useMemo(() => tasksApi(), [])
@@ -25,11 +27,12 @@ export default function TaskBoard() {
   const [commentText, setCommentText] = useState('')
   const [pictureFile, setPictureFile] = useState(null)
   const fileInputRef = React.useRef(null)
+  const [previewSrc, setPreviewSrc] = useState('')
 
-  const MAX_PICTURE_BYTES = 300 * 1024
+  const MAX_PICTURE_BYTES = 200 * 1024
 
   async function compressImage(file, maxBytes = MAX_PICTURE_BYTES) {
-    if (!file || !file.type.startsWith('image/')) return file
+    if (!file || !file.type?.startsWith('image/')) return file
     const url = URL.createObjectURL(file)
     try {
       const img = await new Promise((resolve, reject) => {
@@ -47,27 +50,39 @@ export default function TaskBoard() {
       canvas.height = Math.round(height * scale)
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
 
-      const toBlob = (quality) => new Promise((res) => canvas.toBlob(res, 'image/jpeg', quality))
+      async function toJpeg(q) {
+        return new Promise((res) => canvas.toBlob((b) => res(b), 'image/jpeg', q))
+      }
+      async function toPng() {
+        return new Promise((res) => canvas.toBlob((b) => res(b), 'image/png'))
+      }
+
       let quality = 0.85
-      let blob = await toBlob(quality)
+      let blob = await toJpeg(quality)
+      if (!blob) blob = await toPng()
+
       while (blob && blob.size > maxBytes && quality > 0.4) {
         quality -= 0.1
-        blob = await toBlob(quality)
+        blob = await toJpeg(quality)
+        if (!blob) blob = await toPng()
       }
       let step = 0
-      while (blob && blob.size > maxBytes && step < 4) {
-        // downscale a bit more if still too large
+      while (blob && blob.size > maxBytes && step < 8) {
         scale *= 0.85
         canvas.width = Math.round(width * scale)
         canvas.height = Math.round(height * scale)
         ctx.clearRect(0, 0, canvas.width, canvas.height)
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
-        blob = await toBlob(quality)
+        if (quality > 0.5) quality -= 0.05
+        blob = await toJpeg(quality)
+        if (!blob) blob = await toPng()
         step++
       }
       if (!blob) return file
-      const out = new File([blob], (file.name.replace(/\.[^.]+$/, '') || 'photo') + '.jpg', { type: 'image/jpeg' })
-      return out
+      const mime = blob.type && blob.type.startsWith('image/') ? blob.type : 'image/jpeg'
+      const ext = mime === 'image/png' ? '.png' : '.jpg'
+      const base = (file.name && file.name.replace(/\.[^.]+$/, '')) || 'photo'
+      return new File([blob], base + ext, { type: mime })
     } finally {
       URL.revokeObjectURL(url)
     }
@@ -104,7 +119,10 @@ export default function TaskBoard() {
   }, [user?.id])
 
   useEffect(() => {
-    if (activeQuest) api.list({ questId: activeQuest }).then(setTasks)
+    if (activeQuest) api.list({ questId: activeQuest }).then((ts) => {
+      try { if (import.meta?.env?.DEV) console.debug('[TaskBoard] fetched tasks sample:', ts.slice(0, 3)) } catch {}
+      setTasks(ts)
+    })
     else setTasks([])
   }, [api, activeQuest])
 
@@ -112,6 +130,12 @@ export default function TaskBoard() {
   useEffect(() => {
     if (disableWithoutAsking && newDoneWA) setNewDoneWA(false)
   }, [disableWithoutAsking])
+
+  useEffect(() => {
+    function onKey(e) { if (e.key === 'Escape') setPreviewSrc('') }
+    if (previewSrc) document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [previewSrc])
 
   const add = async (e) => {
     e.preventDefault()
@@ -148,7 +172,7 @@ export default function TaskBoard() {
 
   return (
     <section className="board">
-      <GameHUD tasks={tasks} quest={currentQuest} />
+      <GameHUD tasks={tasks} quest={currentQuest} types={types} quests={quests} />
       <ConfettiBurst trigger={celebrate} />
       {/* Removed duplicate Current Quest pane to keep only HUD */}
 
@@ -157,9 +181,9 @@ export default function TaskBoard() {
       ) : null}
 
       <form className="board__form" onSubmit={add} aria-label="add-task">
-        <TaskTypeSelect types={types} value={activeType} onChange={setActiveType} />
+        <TaskTypeSelect types={types} value={activeType} onChange={setActiveType} disabled={!activeQuest} />
         <label className="form-toggle" title={t('task.bonusTitle')}>
-          <input type="checkbox" checked={newDoneWA} onChange={(e) => setNewDoneWA(e.target.checked)} disabled={disableWithoutAsking} />
+          <input type="checkbox" checked={newDoneWA} onChange={(e) => setNewDoneWA(e.target.checked)} disabled={disableWithoutAsking || !activeQuest} />
           <span className="muted" style={{ fontSize: 12 }}>{t('task.withoutAsking')}</span>
         </label>
         <div className="board__comment">
@@ -168,6 +192,7 @@ export default function TaskBoard() {
             placeholder={t('fields.comment')}
             value={commentText}
             onChange={(e) => setCommentText(e.target.value)}
+            disabled={!activeQuest}
           />
           <input
             ref={fileInputRef}
@@ -178,9 +203,8 @@ export default function TaskBoard() {
             onChange={async (e) => {
               const f = e.target.files && e.target.files[0] ? e.target.files[0] : null
               if (!f) { setPictureFile(null); return }
-              if (f.size <= MAX_PICTURE_BYTES) { setPictureFile(f); return }
-              const compressed = await compressImage(f, MAX_PICTURE_BYTES)
-              setPictureFile(compressed)
+              const processed = await compressImage(f, MAX_PICTURE_BYTES)
+              setPictureFile(processed)
             }}
           />
           <button
@@ -189,12 +213,13 @@ export default function TaskBoard() {
             onClick={() => fileInputRef.current?.click()}
             aria-label={t('media.takePicture')}
             title={t('media.takePicture')}
+            disabled={!activeQuest}
           >
             📷
           </button>
         </div>
         <div className="board__actions">
-          <button className="btn btn-accent" type="submit" disabled={quests.length > 0 && (!activeQuest || !activeType)}>
+          <button className="btn btn-accent" type="submit" disabled={!activeQuest || !activeType}>
             <span className="btn-icon">➕</span> {t('actions.add')}
           </button>
         </div>
@@ -213,11 +238,17 @@ export default function TaskBoard() {
                   <div className="task__name" title={tt?.comment || tt?.taskType || ''}>{task.description}</div>
                   <div className="task__date muted">{fmtDateTime(task.created)}</div>
                 </div>
-                <span className="task__value">
-                  {(Number(task.finalValue ?? task.value) || 0) >= 0 ? '+' : '-'}
-                  {Math.abs(Number(task.finalValue ?? task.value) || 0)} €
-                  {(() => {
-                    const val = Number(task.finalValue ?? task.value) || 0
+                {(() => {
+                  const { value: baseVal, source } = taskValueWithSource(task)
+                  const tt = types.find(tt => tt.id === task.taskType)
+                  const effective = (source !== 'none' && baseVal !== 0) ? baseVal : toNumber(tt?.defaultValue ?? 0)
+                  const tv = Number.isFinite(effective) ? effective : 0
+                  return (
+                <span className="task__value" title={`value: ${tv} (source: ${source !== 'none' ? source : 'taskType.defaultValue'})`}>
+                  {(tv >= 0 ? '+' : '-')}
+                  {Math.abs(tv)} €
+                   {(() => {
+                    const val = tv
                     const doneWA = isDoneWithoutAsking(task)
                     if (val < 0) {
                       return (
@@ -237,7 +268,19 @@ export default function TaskBoard() {
                     }
                     return null
                   })()}
+                  {task.picture ? (
+                    <button
+                      type="button"
+                      onClick={() => setPreviewSrc(fileUrl('tasks', task.id, task.picture))}
+                      aria-label={t('media.viewPicture')}
+                      title={t('media.viewPicture')}
+                      style={{ marginLeft: 6, background: 'none', border: 'none', color: 'inherit', padding: 0, cursor: 'pointer' }}
+                    >
+                      🖼️
+                    </button>
+                  ) : null}
                 </span>
+                )})()}
               </label>
               <div className="task__actions">
                 <button className="link danger" onClick={() => remove(task.id)} aria-label={`${t('task.delete')} ${task.description}`}>
@@ -247,6 +290,14 @@ export default function TaskBoard() {
             </li>
           )})}
         </ul>
+      ) : null}
+      {previewSrc ? (
+        <div className="lightboxBackdrop" onClick={() => setPreviewSrc('')}>
+          <div className="lightbox" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
+            <button className="lightboxClose" onClick={() => setPreviewSrc('')} aria-label={t('actions.close')} title={t('actions.close')}>×</button>
+            <img src={previewSrc} alt={t('media.pictureAlt')} className="lightboxImg" />
+          </div>
+        </div>
       ) : null}
     </section>
   )

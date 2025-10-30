@@ -1,8 +1,6 @@
 /// <reference path="../pb_data/types.d.ts" />
-
 migrate((db) => {
   const dao = new Dao(db)
-
   // task_types
   const taskTypes = new Collection({
     name: 'task_types',
@@ -40,15 +38,14 @@ migrate((db) => {
     indexes: [
       'CREATE UNIQUE INDEX `idx_task_types_taskType` ON `task_types` (`taskType`)'
     ],
-    listRule: null,
-    viewRule: null,
+    listRule: '@request.auth.id != ""',
+    viewRule: '@request.auth.id != ""',
     createRule: null,
     updateRule: null,
     deleteRule: null,
     options: {}
   })
   dao.saveCollection(taskTypes)
-
   // quests
   const quests = new Collection({
     name: 'quests',
@@ -75,24 +72,23 @@ migrate((db) => {
       }),
       new SchemaField({
         system: false,
-        id: 'q_comment',
-        name: 'comment',
-        type: 'text',
+        id: 'q_rules',
+        name: 'rules',
+        type: 'editor',
         required: false,
         unique: false,
-        options: { min: null, max: null, pattern: '' }
+        options: {}
       })
     ],
     indexes: [],
-    listRule: null,
-    viewRule: null,
-    createRule: null,
-    updateRule: null,
-    deleteRule: null,
+    listRule: 'user = @request.auth.id',
+    viewRule: 'user = @request.auth.id',
+    createRule: '@request.data.user = @request.auth.id',
+    updateRule: 'user = @request.auth.id',
+    deleteRule: 'user = @request.auth.id',
     options: {}
   })
   dao.saveCollection(quests)
-
   // tasks (relations added after ids exist)
   const tasks = new Collection({
     name: 'tasks',
@@ -154,22 +150,21 @@ migrate((db) => {
         options: {
           maxSelect: 1,
           maxSize: 204800,
-          mimeTypes: ['image/*'],
+          mimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
           thumbs: [],
           protected: false
         }
       })
     ],
     indexes: [],
-    listRule: null,
-    viewRule: null,
-    createRule: null,
-    updateRule: null,
-    deleteRule: null,
+    listRule: 'quest.user = @request.auth.id',
+    viewRule: 'quest.user = @request.auth.id',
+    createRule: '@request.data.quest.user = @request.auth.id',
+    updateRule: 'quest.user = @request.auth.id',
+    deleteRule: 'quest.user = @request.auth.id',
     options: {}
   })
   dao.saveCollection(tasks)
-
   // payments (relation added after ids exist)
   const payments = new Collection({
     name: 'payments',
@@ -196,21 +191,19 @@ migrate((db) => {
       })
     ],
     indexes: [],
-    listRule: null,
-    viewRule: null,
-    createRule: null,
-    updateRule: null,
-    deleteRule: null,
+    listRule: 'quest.user = @request.auth.id',
+    viewRule: 'quest.user = @request.auth.id',
+    createRule: '@request.data.quest.user = @request.auth.id',
+    updateRule: 'quest.user = @request.auth.id',
+    deleteRule: 'quest.user = @request.auth.id',
     options: {}
   })
   dao.saveCollection(payments)
-
   // fetch created collections to use their IDs in relations
   const taskTypesCol = dao.findCollectionByNameOrId('task_types')
   const questsCol = dao.findCollectionByNameOrId('quests')
   const tasksCol = dao.findCollectionByNameOrId('tasks')
   const paymentsCol = dao.findCollectionByNameOrId('payments')
-
   // tasks.taskType -> task_types (single)
   tasksCol.schema.addField(
     new SchemaField({
@@ -229,7 +222,6 @@ migrate((db) => {
       }
     })
   )
-
   // tasks.quest -> quests (single)
   tasksCol.schema.addField(
     new SchemaField({
@@ -249,7 +241,6 @@ migrate((db) => {
     })
   )
   dao.saveCollection(tasksCol)
-
   // payments.quest -> quests (single, optional, unique)
   paymentsCol.schema.addField(
     new SchemaField({
@@ -273,7 +264,6 @@ migrate((db) => {
     'CREATE UNIQUE INDEX `idx_payments_quest_unique` ON `payments` (`quest`)'
   ]
   dao.saveCollection(paymentsCol)
-
   // quests.user -> users (single, required)
   questsCol.schema.addField(
     new SchemaField({
@@ -293,14 +283,15 @@ migrate((db) => {
     })
   )
   dao.saveCollection(questsCol)
-
   // no explicit return
 }, (db) => {
   const dao = new Dao(db)
   const collections = ['payments', 'tasks', 'task_types', 'quests']
   for (const name of collections) {
     const c = dao.findCollectionByNameOrId(name)
-    if (c) dao.deleteCollection(c)
+    if (c) {
+      dao.deleteCollection(c)
+    }
   }
   // no explicit return
 })
