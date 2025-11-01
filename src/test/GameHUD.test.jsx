@@ -8,10 +8,10 @@ function fmt(n) {
 }
 
 describe('GameHUD estimated money', () => {
-  function renderHUD(tasks) {
+  function renderHUD(tasks, quest = { unit: '€' }) {
     return render(
       <I18nProvider>
-        <GameHUD tasks={tasks} />
+        <GameHUD tasks={tasks} quest={quest} />
       </I18nProvider>
     )
   }
@@ -23,7 +23,7 @@ describe('GameHUD estimated money', () => {
       { id: 'c', description: 'C', value: 10, done: false }, // in MVP, all tasks are considered
     ]
     const expected = 5 + 4 + 10
-    renderHUD(tasks)
+    renderHUD(tasks, { unit: '€' })
     const money = screen.getByLabelText('estimated-money')
     expect(money).toHaveTextContent(`€ ${fmt(expected)}`)
   })
@@ -34,7 +34,7 @@ describe('GameHUD estimated money', () => {
       { id: 'b', description: 'B', value: -2, done: true },
     ]
     const expected = 8
-    renderHUD(tasks)
+    renderHUD(tasks, { unit: '€' })
     const money = screen.getByLabelText('estimated-money')
     expect(money).toHaveTextContent(`€ ${fmt(expected)}`)
   })
@@ -46,7 +46,7 @@ describe('GameHUD estimated money', () => {
       { id: 'c', description: 'C', value: 'oops', done: true }, // ignored as NaN
     ]
     const expected = 10.5
-    renderHUD(tasks)
+    renderHUD(tasks, { unit: '€' })
     const money = screen.getByLabelText('estimated-money')
     expect(money).toHaveTextContent(`€ ${fmt(expected)}`)
   })
@@ -63,7 +63,7 @@ describe('GameHUD estimated money', () => {
     const expected = 5 + -2
     render(
       <I18nProvider>
-        <GameHUD tasks={tasks} types={types} />
+        <GameHUD tasks={tasks} types={types} quest={{ unit: '€' }} />
       </I18nProvider>
     )
     const money = screen.getByLabelText('estimated-money')

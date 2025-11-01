@@ -1,8 +1,10 @@
 # Clean Quest
 
-React app scaffolded with Vite and Vitest. Uses PocketBase as the backend (required).
+Turn chores into a game: reward your kids with XP or cash.
 
 ## Stack
+
+React app scaffolded with Vite and Vitest. Uses PocketBase as the backend (required).
 
 - React (latest)
 - Vite (latest)
@@ -34,28 +36,19 @@ Environment variables (`.env` at project root):
 VITE_POCKETDB_URL=http://127.0.0.1:8090
 ```
 
-If you serve the frontend on http://localhost:5173, add that origin to PocketBase CORS settings (Admin UI → Settings → CORS).
-
-## Project layout
-
-- `index.html` — Vite entry HTML
-- `src/main.jsx` — React bootstrap
-- `src/App.jsx` — main shell
-- `src/components/TaskBoard.jsx` — gamified task board (PocketBase‑aware)
- - `src/components/GameHUD.jsx` — shows estimated money for current quest
-- `src/services/tasks.js` — tasks API (uses PocketBase when configured)
-- `src/services/pb.js` — minimal PocketBase REST client
-- `src/services/pbData.js` — helpers to list quests and task types
-- `src/test/*` — Vitest + Testing Library setup and tests
-
 ## Business rules
 
 - Task value fallback: when a task `finalValue` (or `value`) is missing or equal to 0, the UI uses its associated task type `defaultValue` for display and for the Estimated Money total.
 - Rules fallback: when the current quest has an empty `rules` field, the UI looks back through previous quests (sorted by start date descending) and shows the first non‑empty `rules` it finds. If none exist, it displays “No rules yet.”
 
-## Node version
+### Units for task values
 
-Use Node 18+.
+- The `quests` collection has a new optional `unit` text field that defines the unit used to display task values in the UI (in the task list and in the Estimated Money panel).
+- Supported values: `€`, `$`, or `XP`.
+- Default is `XP` (points) when the field is empty.
+- Rendering:
+  - For currencies (`€`, `$`), the symbol prefixes the number (e.g., `€ 12`).
+  - For other units (e.g., `XP`), the unit is suffixed (e.g., `12 XP`).
 
 ## Docker (PocketBase)
 
@@ -67,15 +60,6 @@ Build the image (override `PB_VERSION`/`PB_ARCH` if needed):
 docker build -t clean-quest-pocketbase \
   --build-arg PB_VERSION=0.22.14 \
   --build-arg PB_ARCH=linux_amd64 .
-```
-
-Optionally pass Vite envs and skip tests during build:
-
-```
-docker build -t clean-quest-pocketbase \
-  --build-arg VITE_POCKETDB_URL=http://127.0.0.1:8090 \
-  --build-arg SKIP_TESTS=true \
-  .
 ```
 
 Run it, persisting data to `./pb_data` and exposing port 8090:
@@ -201,6 +185,7 @@ classDiagram
     dateTime start
     dateTime end
     string comment
+    string unit
   }
 
   Quest "1" --> "0..1" Payment: has been pay by
@@ -208,41 +193,3 @@ classDiagram
   User "1" --> "0..*" Quest: does
 
 ```
-
-
-Voici les règles maintenant que je reprends la gestion de ton argent de poche :
-
-- [Obligatoire] Vaisselle : 5€ à faire une seule fois minimum le WE, à faire avant 15:00. (sauf si absence les deux midis)
-
-- [Obligatoire] Poubelles : 1€ / poubelle (cuisine/compost/2 recyclage/couloir 1er/SDB) 
-
-- [Obligatoire] Linge (sauf Pierre) : 5€ étendre, 1€ ramasser.
-
-- Courses: petite : 2€, grosse: 5€
-
-- 1 seul avertissement, ensuite je le fais à ta place et je déduis le prix de la tâche (je fais les poubelles le lundi matin si pas fait)
-
-- Pas d'avances : tu dois savoir économiser et gérer ton argent, la maison ne fait pas crédit.
-
-- Pas de discussion / de négociation sinon -> 0€.
-
-- 1€ de bonus si tu fais la tâche sans qu'on ait besoin de te demander.
-
-- Amendes: retard au repas: -1€, retard/absence en cours: -2€, insolence: -2€, désobéissance: -1€
-
-- A -50€, blocage du téléphone
-
-- A -100€, plus de sortie
-
-- Réévaluation éventuelle (suivant attitude et inflation) deux fois par an fin juin et fin décembre.
-
-- Le paiement ne se fait que deux fois par mois le dimanche.
-
-- Bingo : +5€ si tu repond à un mail surpirse une fois par mois (peut arriver n'importe quand).
-
-- Rangement chambre: de 0 à 5€ tous les 2 semaines.
-
-
-rm -rf pb_data && mkdir pb_data && sudo chown -R $(id -u):$(id -g) pb_data
-
-docker compose --profile dev up

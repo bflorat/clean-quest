@@ -79,6 +79,16 @@ migrate((db) => {
         unique: false,
         options: {}
       })
+      ,
+      new SchemaField({
+        system: false,
+        id: 'q_unit',
+        name: 'unit',
+        type: 'text',
+        required: false,
+        unique: false,
+        options: { min: null, max: 8, pattern: '^(€|\\$|XP)$' }
+      })
     ],
     indexes: [],
     listRule: 'user = @request.auth.id',

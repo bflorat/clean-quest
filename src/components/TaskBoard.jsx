@@ -243,12 +243,17 @@ export default function TaskBoard() {
                   const tt = types.find(tt => tt.id === task.taskType)
                   const effective = (source !== 'none' && baseVal !== 0) ? baseVal : toNumber(tt?.defaultValue ?? 0)
                   const tv = Number.isFinite(effective) ? effective : 0
+                  const unit = (currentQuest?.unit || 'XP').trim()
+                  const abs = Math.abs(tv)
+                  const sign = tv >= 0 ? '+' : '-'
+                  const rendered = (unit === '€' || unit === '$')
+                    ? `${sign}${unit} ${abs}`
+                    : `${sign}${abs} ${unit}`
                   return (
                 <span className="task__value" title={`value: ${tv} (source: ${source !== 'none' ? source : 'taskType.defaultValue'})`}>
-                  {(tv >= 0 ? '+' : '-')}
-                  {Math.abs(tv)} €
-                   {(() => {
-                    const val = tv
+                  {rendered}
+                  {(() => {
+                  const val = tv
                     const doneWA = isDoneWithoutAsking(task)
                     if (val < 0) {
                       return (

@@ -18,6 +18,12 @@ export default function GameHUD({ tasks, quest, types = [], quests = [] }) {
   }, [showRules])
 
   const fmt = (n) => new Intl.NumberFormat(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(n)
+  const unit = (quest?.unit || 'XP').trim()
+  const fmtAmount = (n) => {
+    const s = fmt(n)
+    if (unit === '€' || unit === '$') return `${unit} ${s}`
+    return `${s} ${unit}`
+  }
 
   function hasRules(html) {
     const s = String(html || '')
@@ -69,7 +75,7 @@ export default function GameHUD({ tasks, quest, types = [], quests = [] }) {
       </div>
       <div className="hud__card">
         <div className="hud__level">{t('hud.estimatedMoney')}</div>
-        <div className="hud__xp" aria-label="estimated-money">€ {fmt(stats.money)}</div>       
+        <div className="hud__xp" aria-label="estimated-money">{fmtAmount(stats.money)}</div>
       </div>
 
       {showRules ? (
