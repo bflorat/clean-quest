@@ -171,7 +171,7 @@ migrate((db) => {
     viewRule: 'quest.user = @request.auth.id',
     createRule: '@request.data.quest.user = @request.auth.id',
     updateRule: 'quest.user = @request.auth.id',
-    deleteRule: 'quest.user = @request.auth.id',
+    deleteRule: '(@request.admin != null) || (quest.user = @request.auth.id && finalValue >= 0)',
     options: {}
   })
   dao.saveCollection(tasks)

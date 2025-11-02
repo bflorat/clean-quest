@@ -8,6 +8,7 @@ import { useAuth } from '../auth/AuthContext.jsx'
 import { useI18n } from '../i18n/I18nProvider.jsx'
 import { isDoneWithoutAsking } from '../lib/taskFlags.js'
 import { taskValue, taskValueWithSource, toNumber } from '../lib/taskValue.js'
+import { canDeleteTask } from '../lib/taskPolicy.js'
 import TaskTypeSelect from './TaskTypeSelect.jsx'
 import { fileUrl } from '../services/pb.js'
 
@@ -231,6 +232,8 @@ export default function TaskBoard() {
         <ul className="board__list">
           {tasks.map((task) => {
             const tt = types.find(tt => tt.id === task.taskType)
+            const tvForDelete = taskValue(task)
+            const deletable = canDeleteTask(task, { isAdmin: false })
             return (
             <li key={task.id} className={task.done ? 'done glow' : ''}>
               <label className="task">
@@ -288,7 +291,7 @@ export default function TaskBoard() {
                 )})()}
               </label>
               <div className="task__actions">
-                <button className="link danger" onClick={() => remove(task.id)} aria-label={`${t('task.delete')} ${task.description}`}>
+                <button className="link danger" onClick={() => remove(task.id)} aria-label={`${t('task.delete')} ${task.description}`} disabled={!deletable} title={!deletable ? t('task.cannotDeletePenalty') : t('task.delete')}>
                   {t('task.delete')}
                 </button>
               </div>

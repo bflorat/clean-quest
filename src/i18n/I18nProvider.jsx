@@ -31,7 +31,8 @@ const messages = {
       bonusTitle: 'Bonus if done without asking',
       delete: 'Delete',
       withoutAsking: 'Without asking',
-      penalty: 'Penalty'
+      penalty: 'Penalty',
+      cannotDeletePenalty: 'Cannot delete a penalty task'
     },
     value: { aria: 'Value' },
     actions: { add: 'Add', close: 'Close' },
@@ -70,7 +71,8 @@ const messages = {
       bonusTitle: 'Bonus si réalisée sans qu’on te le demande',
       delete: 'Supprimer',
       withoutAsking: 'Sans demander',
-      penalty: 'Pénalité'
+      penalty: 'Pénalité',
+      cannotDeletePenalty: 'Suppression impossible pour une tâche pénalité'
     },
     value: { aria: 'Valeur' },
     actions: { add: 'Ajouter', close: 'Fermer' },

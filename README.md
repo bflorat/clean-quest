@@ -34,6 +34,7 @@ Then, create the  database tables with :
 
 - Task value fallback: when a task `finalValue` (or `value`) is missing or equal to 0, the UI uses its associated task type `defaultValue` for display and for the Estimated Money total.
 - Rules fallback: when the current quest has an empty `rules` field, the UI looks back through previous quests (sorted by start date descending) and shows the first non‑empty `rules` it finds. If none exist, it displays “No rules yet.”
+- Deletion protection: regular users cannot delete tasks whose effective value is negative (penalties). Only admins can delete negative‑valued tasks. The backend enforces this via the tasks deleteRule, and the UI disables the delete action accordingly.
 
 ### Units for task values
 
@@ -44,17 +45,6 @@ Then, create the  database tables with :
 - For currencies (`€`, `$`), the symbol prefixes the number (e.g., `€ 12`).
 - For other units (e.g., `XP`), the unit is suffixed (e.g., `12 XP`).
 
-## PWA / Web App Manifest
-
-The app ships with a web manifest and a minimal service worker so it can be installed to the home screen and run in standalone display mode.
-
-- Manifest: `public/manifest.webmanifest`
-- Service Worker: `public/sw.js`
-- Linked from `index.html` with `<link rel="manifest" href="/manifest.webmanifest">` and a `theme-color` meta tag.
-
-Notes:
-- Icons currently use SVG (`/favicon.svg`, `/logo.svg`). For broader platform support (especially iOS), consider adding PNG icons (192×192, 512×512) and an `apple-touch-icon`.
-- The service worker is minimal and doesn’t cache assets yet. Add caching/precaching if you want offline support.
 
 ## Docker (PocketBase)
 

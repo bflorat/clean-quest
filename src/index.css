@@ -42,6 +42,7 @@ body {
 .questDate { display: block; }
 .link { background: none; color: var(--text); border: none; cursor: pointer; padding: 6px 8px; }
 .danger { color: var(--danger); }
+.link:disabled { color: var(--muted) !important; cursor: not-allowed; opacity: 0.6; text-decoration: none; }
 
 /* Game HUD */
 .hud { display: grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap: 12px; margin-bottom: 12px; }
