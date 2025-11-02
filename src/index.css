@@ -31,7 +31,7 @@ body {
 .app__header h1 { margin: 0; font-size: 28px; }
 .tagline { margin: 4px 0 0; color: var(--muted); }
 .app__main { background: rgba(17,24,39,0.6); border: 1px solid #1f2937; border-radius: 12px; padding: 16px; }
-.app__footer { color: var(--muted); display: flex; justify-content: space-between; align-items: center; padding: 6px 12px; }
+.app__footer { color: var(--muted); display: flex; justify-content: space-between; align-items: center; padding: 6px 12px; gap: 8px; flex-wrap: wrap; }
 
 .divider { height: 1px; background: #1f2937; margin: 16px 0; }
 
