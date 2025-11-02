@@ -9,7 +9,10 @@ const messages = {
       password: 'Password',
       signIn: 'Sign in',
       signingIn: 'Signing in…',
-      loginFailed: 'Login failed'
+      loginFailed: 'Login failed',
+      logout: 'Logout',
+      clickToLogout: 'Click to logout',
+      accountMenu: 'Account menu'
     },
     hud: {
       estimatedMoney: 'Estimated Money',
@@ -49,7 +52,10 @@ const messages = {
       password: 'Mot de passe',
       signIn: 'Se connecter',
       signingIn: 'Connexion…',
-      loginFailed: 'Échec de la connexion'
+      loginFailed: 'Échec de la connexion',
+      logout: 'Déconnexion',
+      clickToLogout: 'Clique pour te déconnecter',
+      accountMenu: 'Menu du compte'
     },
     hud: {
       estimatedMoney: 'Gain estimé',
