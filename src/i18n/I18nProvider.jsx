@@ -36,13 +36,15 @@ const messages = {
       delete: 'Delete',
       withoutAsking: 'Without asking',
       penalty: 'Penalty',
-      cannotDeletePenalty: 'Cannot delete a penalty task'
+      cannotDeletePenalty: 'Cannot delete a penalty task',
+      selectType: 'Select a task type'
     },
     value: { aria: 'Value' },
     actions: { add: 'Add', close: 'Close' },
     fields: { comment: 'Comment (optional)' },
     media: { takePicture: 'Take picture', viewPicture: 'View picture', pictureAlt: 'Task picture' },
     loading: { checkingSession: 'Checking session…' },
+    loading: { checkingSession: 'Checking session…', loading: 'Loading…' },
     footer: { note: 'Requires PocketBase backend and user login.' }
   },
   fr: {
@@ -80,13 +82,14 @@ const messages = {
       delete: 'Supprimer',
       withoutAsking: 'Sans demander',
       penalty: 'Pénalité',
-      cannotDeletePenalty: 'Suppression impossible pour une tâche pénalité'
+      cannotDeletePenalty: 'Suppression impossible pour une tâche pénalité',
+      selectType: 'Sélectionne un type de tâche'
     },
     value: { aria: 'Valeur' },
     actions: { add: 'Ajouter', close: 'Fermer' },
     fields: { comment: 'Commentaire (optionnel)' },
     media: { takePicture: 'Prendre une photo', viewPicture: 'Voir la photo', pictureAlt: 'Photo de la tâche' },
-    loading: { checkingSession: 'Vérification de la session…' },
+    loading: { checkingSession: 'Vérification de la session…', loading: 'Chargement…' },
     footer: {  }
   }
 }

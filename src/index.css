@@ -7,6 +7,8 @@
   --danger: #ef4444;
   --ok: #22c55e;
   --glow: #a78bfa;
+  --control-h: 44px;
+  --select-btn-h: 40px;
 }
 
 * { box-sizing: border-box; }
@@ -60,10 +62,10 @@ body {
 /* Task Board */
 .board__header { display: flex; justify-content: space-between; align-items: baseline; }
 .board__form { display: flex; gap: 8px; margin: 12px 0; align-items: center; flex-wrap: wrap; }
-.board__form select { background: #0b1220; color: var(--text); border: 1px solid #1f2937; border-radius: 8px; padding: 8px 12px; height: 40px; font-size: 14px; min-width: 0; flex: 1 1 auto; }
+.board__form select { background: #0b1220; color: var(--text); border: 1px solid #1f2937; border-radius: 8px; padding: 8px 12px; height: var(--control-h); font-size: 14px; min-width: 0; flex: 1 1 auto; }
 .board__form .task-select { width: auto; max-width: 260px; flex: 0 0 auto; }
 .board__form button { height: 36px; padding: 0 10px; display: inline-flex; align-items: center; }
-.form-toggle { display: inline-flex; align-items: center; gap: 4px; height: 40px; padding: 0 8px; border: 1px solid #1f2937; border-radius: 8px; background: #0b1020; flex: 0 0 auto; margin-left: auto; }
+.form-toggle { display: inline-flex; align-items: center; gap: 4px; min-height: var(--control-h); height: var(--control-h); padding: 0 10px; border: 1px solid #1f2937; border-radius: 8px; background: #0b1020; flex: 0 0 auto; margin-left: auto; box-sizing: border-box; }
 .form-toggle input { width: 14px; height: 14px; }
 .form-toggle span { font-size: 10px; white-space: normal; line-height: 1.1; max-width: 56px; display: inline-block; }
 
@@ -75,6 +77,22 @@ body {
 .btn-icon { font-size: 16px; line-height: 1; }
 
 .board__comment { margin-top: 6px; display: flex; gap: 8px; flex: 0 0 100%; }
+.board__comment .btn {
+  border-radius: 999px;
+  /* perfect circle */
+  width: var(--control-h);
+  height: var(--control-h);
+  /* center content */
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* avoid baseline/emoji offset */
+  line-height: 1;
+  font-size: 20px;
+  gap: 0;
+}
+.cam-emoji { display: inline-block; transform: translateY(-2px); }
 .comment-input { width: 100%; background: #0b1220; color: var(--text); border: 1px solid #1f2937; border-radius: 8px; padding: 10px 12px; }
 .board__actions { display: flex; justify-content: center; margin-top: 8px; width: 100%; flex: 0 0 100%; }
 .board__actions .btn { width: 60%; max-width: 320px; min-width: 200px; justify-content: center; }
@@ -92,8 +110,8 @@ body {
 html, body { overflow-x: hidden; }
 
 /* Custom Select */
-.select { position: relative; flex: 1 1 260px; width: auto; max-width: 100%; min-width: 160px; }
-.select__button { height: 40px; padding: 0 12px; background: #0b1220; color: var(--text); border: 1px solid #1f2937; border-radius: 8px; width: 100%; display: inline-flex; align-items: center; justify-content: space-between; gap: 8px; }
+.select { position: relative; flex: 1 1 260px; width: auto; max-width: 60%; min-width: 160px; height: var(--control-h); display: flex; align-items: center; padding: 2px; box-sizing: border-box; }
+.select__button { height: var(--select-btn-h); padding: 4px 16px; background: #0b1220; color: var(--text); border: 1px solid #1f2937; border-radius: 8px; width: 100%; display: inline-flex; align-items: center; justify-content: space-between; gap: 8px; box-sizing: border-box; line-height: calc(var(--select-btn-h) - 8px); }
 .select__label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .select__chev { font-size: 12px; opacity: 0.8; }
 .select__menu { position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: #0b1220; border: 1px solid #1f2937; border-radius: 8px; max-height: 220px; overflow-y: auto; z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.35); }
@@ -101,8 +119,8 @@ html, body { overflow-x: hidden; }
 .select__option:hover, .select__option.active { background: #111827; }
 
 @media (max-width: 480px) {
-  .select { flex: 1 1 180px; min-width: 140px; max-width: 70%; }
-  .select__button { height: 40px; }
+  .select { flex: 1 1 180px; min-width: 140px; max-width: 60%; height: var(--control-h); }
+  .select__button { height: var(--select-btn-h); line-height: calc(var(--select-btn-h) - 8px); }
 }
 .dtNote { font-size: 12px; }
 .board__filters { display: flex; gap: 12px; align-items: end; margin: 8px 0; }
@@ -114,10 +132,14 @@ html, body { overflow-x: hidden; }
 .board__list { list-style: none; margin: 0; padding: 0; }
 .board__list li { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; padding: 10px 8px; border-bottom: 1px solid #1f2937; }
 .board__list li:last-child { border-bottom: none; }
-.task { display: flex; align-items: center; gap: 10px; }
-.task__name { font-weight: 500; }
+.task { display: flex; align-items: center; gap: 10px; justify-content: space-between; }
+.task > div:first-child { flex: 1 1 auto; min-width: 0; max-width: 75%; }
+.task__name { font-weight: 500; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.board__list li.done .task__name { white-space: normal; overflow: visible; text-overflow: unset; word-break: break-word; overflow-wrap: anywhere; }
 .task__date { font-size: 12px; margin-top: 2px; }
-.task__value { color: #c7d2fe; font-size: 12px; padding: 2px 6px; background: rgba(124,58,237,0.15); border: 1px solid rgba(124,58,237,0.35); border-radius: 999px; display: inline-flex; align-items: center; gap: 4px; }
+.board__list li.done .task { align-items: center; }
+.board__list li.done .task__value { align-self: center; }
+.task__value { color: #c7d2fe; font-size: 12px; padding: 2px 6px; background: rgba(124,58,237,0.15); border: 1px solid rgba(124,58,237,0.35); border-radius: 999px; display: inline-flex; align-items: center; gap: 4px; flex: 0 0 auto; white-space: nowrap; }
 .gain-icon { margin-left: 4px; vertical-align: middle; display: inline-block; width: 14px; height: 14px; }
 .gain-icon.bonus { color: #ffffff; }
 .gain-icon.penalty { color: #fca5a5; }
@@ -153,3 +175,7 @@ html, body { overflow-x: hidden; }
 .drawerContent :is(h1,h2,h3,h4) { margin: 0.6em 0 0.3em; }
 .drawerContent p { margin: 0.5em 0; }
 .drawerContent ul { padding-left: 1.2em; }
+
+/* Spinner */
+.spinner { width: 16px; height: 16px; border-radius: 50%; border: 2px solid rgba(231, 229, 255, 0.25); border-top-color: var(--glow); display: inline-block; animation: spin 900ms linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }

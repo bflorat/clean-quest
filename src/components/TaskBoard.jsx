@@ -29,6 +29,7 @@ export default function TaskBoard() {
   const [pictureFile, setPictureFile] = useState(null)
   const fileInputRef = React.useRef(null)
   const [previewSrc, setPreviewSrc] = useState('')
+  const [tasksLoading, setTasksLoading] = useState(false)
 
   const MAX_PICTURE_BYTES = 200 * 1024
 
@@ -114,17 +115,23 @@ export default function TaskBoard() {
       }
       if (ts.length) {
         setTypes(ts)
-        setActiveType(ts[0].id)
+        // Do not preselect a task type; user must choose one
+        setActiveType('')
       }
     })()
   }, [user?.id])
 
   useEffect(() => {
-    if (activeQuest) api.list({ questId: activeQuest }).then((ts) => {
-      try { if (import.meta?.env?.DEV) console.debug('[TaskBoard] fetched tasks sample:', ts.slice(0, 3)) } catch {}
-      setTasks(ts)
-    })
-    else setTasks([])
+    if (activeQuest) {
+      setTasksLoading(true)
+      api.list({ questId: activeQuest }).then((ts) => {
+        try { if (import.meta?.env?.DEV) console.debug('[TaskBoard] fetched tasks sample:', ts.slice(0, 3)) } catch {}
+        setTasks(ts)
+      }).finally(() => setTasksLoading(false))
+    } else {
+      setTasks([])
+      setTasksLoading(false)
+    }
   }, [api, activeQuest])
 
   // If selected type indicates a negative value, ensure toggle is off
@@ -184,7 +191,7 @@ export default function TaskBoard() {
       <form className="board__form" onSubmit={add} aria-label="add-task">
         <TaskTypeSelect types={types} value={activeType} onChange={setActiveType} disabled={!activeQuest} />
         <label className="form-toggle" title={t('task.bonusTitle')}>
-          <input type="checkbox" checked={newDoneWA} onChange={(e) => setNewDoneWA(e.target.checked)} disabled={disableWithoutAsking || !activeQuest} />
+          <input type="checkbox" checked={newDoneWA} onChange={(e) => setNewDoneWA(e.target.checked)} disabled={disableWithoutAsking || !activeQuest || !activeType} />
           <span className="muted" style={{ fontSize: 12 }}>{t('task.withoutAsking')}</span>
         </label>
         <div className="board__comment">
@@ -216,7 +223,7 @@ export default function TaskBoard() {
             title={t('media.takePicture')}
             disabled={!activeQuest}
           >
-            📷
+            <span className="cam-emoji" aria-hidden="true">📷</span>
           </button>
         </div>
         <div className="board__actions">
@@ -228,6 +235,20 @@ export default function TaskBoard() {
 
       {(!activeQuest) ? (
         <p className="muted">{t('board.tipCreate')}</p>
+      ) : tasksLoading ? (
+        <ul className="board__list" aria-busy="true" aria-live="polite">
+          <li className="done">
+            <label className="task">
+              <div>
+                <div className="task__name muted">{t('loading.loading') || 'Loading…'}</div>
+                <div className="task__date muted">&nbsp;</div>
+              </div>
+              <span className="task__value" aria-hidden="true">
+                <span className="spinner" />
+              </span>
+            </label>
+          </li>
+        </ul>
       ) : tasks.length > 0 ? (
         <ul className="board__list">
           {tasks.map((task) => {
