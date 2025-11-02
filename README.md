@@ -63,7 +63,7 @@ A production multi-stage Dockerfile is included at `Dockerfile` (based on Pocket
 Build the image (override `PB_VERSION`/`PB_ARCH` if needed):
 
 ```
-docker build -t clean-quest-pocketbase \
+docker build -t clean-quest-pocketbase:<release> \
   --build-arg PB_VERSION=0.22.14 \
   --build-arg PB_ARCH=linux_amd64 .
 ```

@@ -15,3 +15,12 @@ root.render(
     </I18nProvider>
   </React.StrictMode>
 )
+
+// Register service worker in production (and on localhost) for PWA installability
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    try {
+      navigator.serviceWorker.register('/sw.js').catch(() => {})
+    } catch {}
+  })
+}
