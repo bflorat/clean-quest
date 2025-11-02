@@ -201,11 +201,11 @@ migrate((db) => {
       })
     ],
     indexes: [],
-    listRule: 'quest.user = @request.auth.id',
-    viewRule: 'quest.user = @request.auth.id',
-    createRule: '@request.data.quest.user = @request.auth.id',
-    updateRule: 'quest.user = @request.auth.id',
-    deleteRule: 'quest.user = @request.auth.id',
+    listRule: '@request.admin != null',
+    viewRule: '@request.admin != null',
+    createRule: '@request.admin != null',
+    updateRule: '@request.admin != null',
+    deleteRule: '@request.admin != null',
     options: {}
   })
   dao.saveCollection(payments)
@@ -250,18 +250,17 @@ migrate((db) => {
       }
     })
   )
-  dao.saveCollection(tasksCol)
-  // payments.quest -> quests (single, optional, unique)
-  paymentsCol.schema.addField(
+  // tasks.payment -> payments (single, optional)
+  tasksCol.schema.addField(
     new SchemaField({
       system: false,
-      id: 'p_quest_rel',
-      name: 'quest',
+      id: 't_payment_rel',
+      name: 'payment',
       type: 'relation',
       required: false,
       unique: false,
       options: {
-        collectionId: questsCol.id,
+        collectionId: paymentsCol.id,
         cascadeDelete: false,
         minSelect: null,
         maxSelect: 1,
@@ -269,10 +268,26 @@ migrate((db) => {
       }
     })
   )
-  paymentsCol.indexes = [
-    ...(paymentsCol.indexes || []),
-    'CREATE UNIQUE INDEX `idx_payments_quest_unique` ON `payments` (`quest`)'
-  ]
+  dao.saveCollection(tasksCol)
+  // payments.user -> users (single, required)
+  paymentsCol.schema.addField(
+    new SchemaField({
+      system: false,
+      id: 'p_user_rel',
+      name: 'user',
+      type: 'relation',
+      required: true,
+      unique: false,
+      presentable: true,
+      options: {
+        collectionId: '_pb_users_auth_',
+        cascadeDelete: false,
+        minSelect: null,
+        maxSelect: 1,
+        displayFields: ["username", "email"]
+      }
+    })
+  )
   dao.saveCollection(paymentsCol)
   // quests.user -> users (single, required)
   questsCol.schema.addField(
