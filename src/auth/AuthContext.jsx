@@ -34,13 +34,18 @@ export function AuthProvider({ children }) {
     return res
   }
 
+  const refresh = async () => {
+    await refreshAuth()
+    setUser(getUser())
+  }
+
   const logout = async () => {
     clearAuth()
     setUser(null)
   }
 
   return (
-    <AuthCtx.Provider value={{ user, loading, error, login, logout }}>
+    <AuthCtx.Provider value={{ user, loading, error, login, logout, refresh }}>
       {children}
     </AuthCtx.Provider>
   )

@@ -2,17 +2,18 @@ import React from 'react'
 import TaskBoard from './components/TaskBoard.jsx'
 import Login from './components/Login.jsx'
 import { useAuth } from './auth/AuthContext.jsx'
-import { userAvatarUrl } from './services/pb.js'
+import { userAvatarUrl, pb } from './services/pb.js'
 import { useI18n } from './i18n/I18nProvider.jsx'
 import LangSwitcher from './components/LangSwitcher.jsx'
 import './App.css'
 
 export default function App() {
-  const { user, loading, logout } = useAuth()
+  const { user, loading, logout, refresh } = useAuth()
   const { t } = useI18n()
   const version = (typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '')
   const [menuOpen, setMenuOpen] = React.useState(false)
   const userMenuRef = React.useRef(null)
+  const avatarInputRef = React.useRef(null)
 
   React.useEffect(() => {
     function onDoc(e) {
@@ -62,9 +63,33 @@ export default function App() {
           </div>
           {menuOpen ? (
             <div className="userMenu" role="menu" aria-label={t('auth.accountMenu')}>
+              <button className="userMenu__item" role="menuitem" onClick={() => { setMenuOpen(false); avatarInputRef.current?.click() }}>
+                {t('auth.changePicture')}
+              </button>
               <button className="userMenu__item" role="menuitem" onClick={logout}>{t('auth.logout')}</button>
             </div>
           ) : null}
+          <input
+            ref={avatarInputRef}
+            type="file"
+            accept="image/*"
+            style={{ display: 'none' }}
+            onChange={async (e) => {
+              const file = e.target.files && e.target.files[0]
+              try {
+                if (!file) return
+                const fd = new FormData()
+                fd.append('avatar', file, file.name)
+                await pb.update('_pb_users_auth_', user.id, fd)
+                await refresh()
+              } catch (err) {
+                console.error('Failed to update avatar', err)
+              } finally {
+                setMenuOpen(false)
+                if (e.target) e.target.value = ''
+              }
+            }}
+          />
           </div>
         ) : null}
         <p className="tagline">{t('app.tagline')}</p>

@@ -12,7 +12,8 @@ const messages = {
       loginFailed: 'Login failed',
       logout: 'Logout',
       clickToLogout: 'Click to logout',
-      accountMenu: 'Account menu'
+      accountMenu: 'Account menu',
+      changePicture: 'Change picture'
     },
     hud: {
       estimatedMoney: 'Estimated Money',
@@ -55,7 +56,8 @@ const messages = {
       loginFailed: 'Échec de la connexion',
       logout: 'Déconnexion',
       clickToLogout: 'Clique pour te déconnecter',
-      accountMenu: 'Menu du compte'
+      accountMenu: 'Menu du compte',
+      changePicture: 'Changer la photo'
     },
     hud: {
       estimatedMoney: 'Gain estimé',
