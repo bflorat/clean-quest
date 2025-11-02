@@ -43,7 +43,6 @@ const messages = {
     actions: { add: 'Add', close: 'Close' },
     fields: { comment: 'Comment (optional)' },
     media: { takePicture: 'Take picture', viewPicture: 'View picture', pictureAlt: 'Task picture' },
-    loading: { checkingSession: 'Checking session…' },
     loading: { checkingSession: 'Checking session…', loading: 'Loading…' },
     footer: { note: 'Requires PocketBase backend and user login.' }
   },
