@@ -91,7 +91,7 @@ body {
 html, body { overflow-x: hidden; }
 
 /* Custom Select */
-.select { position: relative; flex: 0 0 300px; width: 300px; max-width: 300px; }
+.select { position: relative; flex: 1 1 260px; width: auto; max-width: 100%; min-width: 160px; }
 .select__button { height: 40px; padding: 0 12px; background: #0b1220; color: var(--text); border: 1px solid #1f2937; border-radius: 8px; width: 100%; display: inline-flex; align-items: center; justify-content: space-between; gap: 8px; }
 .select__label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .select__chev { font-size: 12px; opacity: 0.8; }
@@ -100,7 +100,7 @@ html, body { overflow-x: hidden; }
 .select__option:hover, .select__option.active { background: #111827; }
 
 @media (max-width: 480px) {
-  .select { flex: 0 0 240px; width: 240px; max-width: 240px; }
+  .select { flex: 1 1 180px; min-width: 140px; max-width: 70%; }
   .select__button { height: 40px; }
 }
 .dtNote { font-size: 12px; }
