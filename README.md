@@ -20,20 +20,14 @@ React app scaffolded with Vite and Vitest. Uses PocketBase as the backend (requi
 - `npm run test:run` — run tests once
 - `npm run test:coverage` — coverage report
 
-## PocketBase backend
+## Installation
 
-The gameplay UI (Task Board + HUD) talks to PocketBase via REST when `VITE_POCKETDB_URL` is set. Use the PocketBase admin GUI to manage data (collections are provisioned by the included migration).
+After installation, create a PocketDB admin account at `https://<your website>/_`.
 
-Before adding tasks in the app, create at least:
-- One Quest (collection: `quests`)
-- One Task Type (collection: `task_types`)
-
-Then, in the app’s Task Board, pick the Quest and Task Type and add tasks. Completion updates sync to PocketBase.
-
-Environment variables (`.env` at project root):
+Then, create the  database tables with : 
 
 ```
-VITE_POCKETDB_URL=http://127.0.0.1:8090
+/pb/pocketbase migrate up --dir=/pb_data --migrationsDir=/pb/pb_migrations
 ```
 
 ## Business rules
@@ -47,8 +41,20 @@ VITE_POCKETDB_URL=http://127.0.0.1:8090
 - Supported values: `€`, `$`, or `XP`.
 - Default is `XP` (points) when the field is empty.
 - Rendering:
-  - For currencies (`€`, `$`), the symbol prefixes the number (e.g., `€ 12`).
-  - For other units (e.g., `XP`), the unit is suffixed (e.g., `12 XP`).
+- For currencies (`€`, `$`), the symbol prefixes the number (e.g., `€ 12`).
+- For other units (e.g., `XP`), the unit is suffixed (e.g., `12 XP`).
+
+## PWA / Web App Manifest
+
+The app ships with a web manifest and a minimal service worker so it can be installed to the home screen and run in standalone display mode.
+
+- Manifest: `public/manifest.webmanifest`
+- Service Worker: `public/sw.js`
+- Linked from `index.html` with `<link rel="manifest" href="/manifest.webmanifest">` and a `theme-color` meta tag.
+
+Notes:
+- Icons currently use SVG (`/favicon.svg`, `/logo.svg`). For broader platform support (especially iOS), consider adding PNG icons (192×192, 512×512) and an `apple-touch-icon`.
+- The service worker is minimal and doesn’t cache assets yet. Add caching/precaching if you want offline support.
 
 ## Docker (PocketBase)
 
@@ -135,7 +141,6 @@ docker compose run --rm pocketbase migrate up
 ```
 docker compose run --rm pocketbase migrate down
 ```
-
 
 
 # Data model
