@@ -189,6 +189,7 @@ export default function TaskBoard() {
       ) : null}
 
       <form className="board__form" onSubmit={add} aria-label="add-task">
+        <div className="board__formTitle">{t('board.addNewTask')}</div>
         <TaskTypeSelect types={types} value={activeType} onChange={setActiveType} disabled={!activeQuest} />
         <label className="form-toggle" title={t('task.bonusTitle')}>
           <input type="checkbox" checked={newDoneWA} onChange={(e) => setNewDoneWA(e.target.checked)} disabled={disableWithoutAsking || !activeQuest || !activeType} />

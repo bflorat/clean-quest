@@ -27,6 +27,7 @@ const messages = {
       noActiveQuest: 'No quest active now. Create one covering the current date in PocketBase.',
       taskType: 'Task Type',
       placeholderAdd: 'Add a task (e.g., Dishes)',
+      addNewTask: 'Add a new task',
       tipCreate: 'Tip: Create a Quest active today and at least one Task Type in PocketBase.',
       noTasksYet: 'No tasks yet. Add your first task!'
     },
@@ -72,6 +73,7 @@ const messages = {
       noActiveQuest: 'Aucune quête active. Crée une quête couvrant la date actuelle dans PocketBase.',
       taskType: 'Type de tâche',
       placeholderAdd: 'Ajouter une tâche (ex. Vaisselle)',
+      addNewTask: 'Ajouter une nouvelle tâche',
       tipCreate: 'Astuce : crée une quête active aujourd’hui et au moins un type de tâche dans PocketBase.',
       noTasksYet: 'Aucune tâche. Ajoute ta première tâche !'
     },
