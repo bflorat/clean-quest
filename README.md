@@ -89,7 +89,7 @@ Notes:
 
 `docker-compose.yml` is included to run PocketBase and (optionally) a Vite dev server.
 
-- Build and run PocketBase (production image with embedded SPA):
+- Run PocketBase  in DEV:
 
 ```
 docker compose up -d pocketbase
@@ -98,7 +98,8 @@ docker compose up -d pocketbase
 - Run Vite dev server alongside PocketBase (hot reload):
 
 ```
-docker compose --profile dev up web-dev pocketbase
+docker network prune -f
+docker compose --profile dev up 
 ```
 
 You can configure build arguments and Vite envs via a local `.env` file (see `.env.example`). Common variables:
