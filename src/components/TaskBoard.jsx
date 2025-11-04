@@ -259,7 +259,7 @@ export default function TaskBoard() {
             <li key={task.id} className={task.done ? 'done glow' : ''}>
               <label className="task">
                 <div>
-                  <div className="task__name" title={tt?.comment || tt?.taskType || ''}>{task.description}</div>
+                  <div className="task__name" title={(task.done && task.comment) ? task.comment : (tt?.comment || tt?.taskType || '')}>{task.description}</div>
                   <div className="task__date muted">{fmtDateTime(task.created)}</div>
                 </div>
                 {(() => {
