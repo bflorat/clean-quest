@@ -16,22 +16,30 @@ describe('GameHUD estimated money', () => {
     )
   }
 
-  it('sums values of tasks (uses finalValue when present)', () => {
+  it('sums values using finalValue or taskType default', () => {
+    const types = [
+      { id: 't1', defaultValue: 5 },
+      { id: 't2', defaultValue: 10 },
+    ]
     const tasks = [
-      { id: 'a', description: 'A', value: 5, done: true },
-      { id: 'b', description: 'B', value: 3, finalValue: 4, done: true }, // finalValue wins
-      { id: 'c', description: 'C', value: 10, done: false }, // in MVP, all tasks are considered
+      { id: 'a', taskType: 't1', done: true },                 // uses default 5
+      { id: 'b', finalValue: 4, taskType: 't1', done: true },  // uses finalValue 4
+      { id: 'c', taskType: 't2', done: false },                // uses default 10 (MVP includes all)
     ]
     const expected = 5 + 4 + 10
-    renderHUD(tasks, { unit: '€' })
+    render(
+      <I18nProvider>
+        <GameHUD tasks={tasks} quest={{ unit: '€' }} types={types} />
+      </I18nProvider>
+    )
     const money = screen.getByLabelText('estimated-money')
     expect(money).toHaveTextContent(`€ ${fmt(expected)}`)
   })
 
-  it('includes negative values as penalties in the sum', () => {
+  it('includes negative finalValue penalties in the sum', () => {
     const tasks = [
-      { id: 'a', description: 'A', value: 10, done: true },
-      { id: 'b', description: 'B', value: -2, done: true },
+      { id: 'a', finalValue: 10, done: true },
+      { id: 'b', finalValue: -2, done: true },
     ]
     const expected = 8
     renderHUD(tasks, { unit: '€' })
@@ -39,28 +47,27 @@ describe('GameHUD estimated money', () => {
     expect(money).toHaveTextContent(`€ ${fmt(expected)}`)
   })
 
-  it('parses string values gracefully', () => {
+  it('parses string finalValues gracefully', () => {
     const tasks = [
-      { id: 'a', description: 'A', value: '7', done: true },
-      { id: 'b', description: 'B', finalValue: '3.5', done: true },
-      { id: 'c', description: 'C', value: 'oops', done: true }, // ignored as NaN
+      { id: 'a', finalValue: '7', done: true },
+      { id: 'b', finalValue: '3.5', done: true },
+      { id: 'c', finalValue: '0', done: true },
     ]
     const expected = 10.5
     renderHUD(tasks, { unit: '€' })
     const money = screen.getByLabelText('estimated-money')
     expect(money).toHaveTextContent(`€ ${fmt(expected)}`)
   })
-
-  it('falls back to taskType.defaultValue when finalValue is 0', () => {
+  it('uses finalValue 0 when explicitly set', () => {
     const types = [
       { id: 'tt1', taskType: 'A', defaultValue: 5 },
       { id: 'tt2', taskType: 'B', defaultValue: -2 },
     ]
     const tasks = [
-      { id: 'a', description: 'A', finalValue: 0, taskType: 'tt1' },
-      { id: 'b', description: 'B', value: 0, taskType: 'tt2' },
+      { id: 'a', finalValue: 0, taskType: 'tt1' }, // uses 0, not fallback
+      { id: 'b', taskType: 'tt2' },               // uses default -2
     ]
-    const expected = 5 + -2
+    const expected = 0 + -2
     render(
       <I18nProvider>
         <GameHUD tasks={tasks} types={types} quest={{ unit: '€' }} />

@@ -46,11 +46,23 @@ export function taskValueWithSource(task) {
 // Returns effective value for a task, falling back to its task type defaultValue
 // when missing or equal to 0.
 export function effectiveTaskValue(task, types = []) {
-  const { value: tv, source } = taskValueWithSource(task)
-  // Prefer explicit non-zero value
-  if (Number.isFinite(tv) && tv !== 0) return tv
-  // Otherwise fallback to taskType.defaultValue
+  const { present, value } = readFinalValue(task)
+  if (present) return value
   const typeId = task?.taskType
   const tt = Array.isArray(types) ? types.find(t => t?.id === typeId) : null
   return toNumber(tt?.defaultValue ?? 0)
+}
+
+// Reads the task finalValue in a tolerant way (different casings/keys).
+// Returns { present: boolean, value: number }
+export function readFinalValue(task) {
+  if (!task || typeof task !== 'object') return { present: false, value: 0 }
+  const keys = ['finalValue', 'final_value', 'finalvalue']
+  for (const k of keys) {
+    const v = task[k]
+    if (v !== undefined && v !== null && v !== '') {
+      return { present: true, value: toNumber(v) }
+    }
+  }
+  return { present: false, value: 0 }
 }

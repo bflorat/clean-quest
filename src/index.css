@@ -96,7 +96,7 @@ body {
 .cam-emoji { display: inline-block; transform: translateY(-2px); }
 .comment-input { width: 100%; background: #0b1220; color: var(--text); border: 1px solid #1f2937; border-radius: 8px; padding: 10px 12px; }
 .board__actions { display: flex; justify-content: center; margin-top: 8px; width: 100%; flex: 0 0 100%; }
-.board__actions .btn { width: 60%; max-width: 320px; min-width: 200px; justify-content: center; }
+.board__actions .btn { width: 100%; max-width: none; min-width: 0; justify-content: center; }
 @media (max-width: 480px) {
   .board__comment .btn { flex: 0 0 auto; white-space: nowrap; }
 }
@@ -135,9 +135,23 @@ html, body { overflow-x: hidden; }
 .board__list li:last-child { border-bottom: none; }
 .task { display: flex; align-items: center; gap: 10px; justify-content: space-between; }
 .task > div:first-child { flex: 1 1 auto; min-width: 0; max-width: 75%; }
-.task__name { font-weight: 500; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-.board__list li.done .task__name { white-space: normal; overflow: visible; text-overflow: unset; word-break: break-word; overflow-wrap: anywhere; }
+.task__name {
+  font-weight: 500;
+  /* wrap long titles onto multiple lines */
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2; /* show up to 2 lines by default */
+}
+.board__list li.done .task__name {
+  /* allow a bit more for done items */
+  -webkit-line-clamp: 3;
+}
 .task__date { font-size: 12px; margin-top: 2px; }
+.task__comment { font-size: 12px; margin-top: 2px; line-height: 1.3; font-style: italic; }
 .board__list li.done .task { align-items: center; }
 .board__list li.done .task__value { align-self: center; }
 .task__value { color: #c7d2fe; font-size: 12px; padding: 2px 6px; background: rgba(124,58,237,0.15); border: 1px solid rgba(124,58,237,0.35); border-radius: 999px; display: inline-flex; align-items: center; gap: 4px; flex: 0 0 auto; white-space: nowrap; }

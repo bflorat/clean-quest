@@ -7,7 +7,7 @@ import GameHUD from './GameHUD.jsx'
 import { useAuth } from '../auth/AuthContext.jsx'
 import { useI18n } from '../i18n/I18nProvider.jsx'
 import { isDoneWithoutAsking } from '../lib/taskFlags.js'
-import { taskValue, taskValueWithSource, toNumber } from '../lib/taskValue.js'
+import { taskValue, toNumber, readFinalValue } from '../lib/taskValue.js'
 import { canDeleteTask } from '../lib/taskPolicy.js'
 import TaskTypeSelect from './TaskTypeSelect.jsx'
 import { fileUrl } from '../services/pb.js'
@@ -260,13 +260,15 @@ export default function TaskBoard() {
               <label className="task">
                 <div>
                   <div className="task__name" title={(task.done && task.comment) ? task.comment : (tt?.comment || tt?.taskType || '')}>{displayName}</div>
+                  {task.comment ? (
+                    <div className="task__comment muted">({task.comment})</div>
+                  ) : null}
                   <div className="task__date muted">{fmtDateTime(task.created)}</div>
                 </div>
                 {(() => {
-                  const { value: baseVal, source } = taskValueWithSource(task)
                   const tt = types.find(tt => tt.id === task.taskType)
-                  const effective = (source !== 'none' && baseVal !== 0) ? baseVal : toNumber(tt?.defaultValue ?? 0)
-                  const tv = Number.isFinite(effective) ? effective : 0
+                  const { present: hasFinal, value: fv } = readFinalValue(task)
+                  const tv = hasFinal ? fv : toNumber(tt?.defaultValue ?? 0)
                   const unit = (currentQuest?.unit || 'XP').trim()
                   const abs = Math.abs(tv)
                   const sign = tv >= 0 ? '+' : '-'
@@ -274,7 +276,7 @@ export default function TaskBoard() {
                     ? `${sign}${unit} ${abs}`
                     : `${sign}${abs} ${unit}`
                   return (
-                <span className="task__value" title={`value: ${tv} (source: ${source !== 'none' ? source : 'taskType.defaultValue'})`}>
+                <span className="task__value" title={`value: ${tv} (source: ${hasFinal ? 'finalValue' : 'taskType.defaultValue'})`}>
                   {rendered}
                   {(() => {
                   const val = tv
