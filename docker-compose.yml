@@ -10,13 +10,13 @@ services:
         VITE_BASE: ${VITE_BASE:-/}
         SKIP_TESTS: ${SKIP_TESTS:-true}
     image: clean-quest-pocketbase:latest
-    container_name: clean-quest-pocketbase
     user: "${UID:-1000}:${GID:-1000}"
     ports:
       - "8090:8090"
     volumes:
       - ./pb_data:/pb/pb_data
       - ./pb_migrations:/pb/pb_migrations:ro
+    networks: [clean-quest]
 
   web-dev:
     profiles: ["dev"]
@@ -32,3 +32,8 @@ services:
     user: "${UID:-1000}:${GID:-1000}"
     depends_on:
       - pocketbase
+    networks: [clean-quest]
+
+networks:
+  clean-quest:
+    name: clean-quest-net
