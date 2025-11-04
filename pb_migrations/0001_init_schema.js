@@ -14,6 +14,7 @@ migrate((db) => {
         type: 'text',
         required: true,
         unique: true,
+        presentable: true,
         options: { min: null, max: null, pattern: '' }
       }),
       new SchemaField({
@@ -58,6 +59,7 @@ migrate((db) => {
         name: 'start',
         type: 'date',
         required: true,
+        presentable: true,
         unique: false,
         options: { min: null, max: null }
       }),
@@ -66,7 +68,7 @@ migrate((db) => {
         id: 'q_end',
         name: 'end',
         type: 'date',
-        required: false,
+        required: true,
         unique: false,
         options: { min: null, max: null }
       }),
@@ -105,15 +107,6 @@ migrate((db) => {
     type: 'base',
     system: false,
     schema: [
-      new SchemaField({
-        system: false,
-        id: 't_description',
-        name: 'description',
-        type: 'text',
-        required: false,
-        unique: false,
-        options: { min: null, max: null, pattern: '' }
-      }),
       new SchemaField({
         system: false,
         id: 't_finalValue',
@@ -186,7 +179,8 @@ migrate((db) => {
         id: 'p_datePayment',
         name: 'datePayment',
         type: 'date',
-        required: false,
+        required: true,
+        presentable: true,
         unique: false,
         options: { min: null, max: null }
       }),
@@ -284,7 +278,7 @@ migrate((db) => {
         cascadeDelete: false,
         minSelect: null,
         maxSelect: 1,
-        displayFields: ["username", "email"]
+        displayFields: ["name", "username", "email"]
       }
     })
   )
@@ -308,6 +302,21 @@ migrate((db) => {
     })
   )
   dao.saveCollection(questsCol)
+  // ensure users.name is required and presentable
+  const usersCol = dao.findCollectionByNameOrId('_pb_users_auth_')
+  if (usersCol) {
+    usersCol.schema.addField(new SchemaField({
+      system: false,
+      id: 'name',
+      name: 'name',
+      type: 'text',
+      required: true,
+      unique: false,
+      presentable: true,
+      options: { min: 2, max: 120, pattern: ".*\\S.*" }
+    }))
+    dao.saveCollection(usersCol)
+  }
   // no explicit return
 }, (db) => {
   const dao = new Dao(db)

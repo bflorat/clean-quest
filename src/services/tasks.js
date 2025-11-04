@@ -7,7 +7,7 @@ export function tasksApi() {
       const filter = questId ? `quest = "${questId}"` : undefined
       return pb.list(col, { perPage: 200, sort: '-created', ...(filter ? { filter } : {}) })
     },
-    async create({ description, value = 1, finalValue, done = false, doneWithoutAsking = false, comment = '', picture, taskTypeId, questId }) {
+    async create({ value = 1, finalValue, done = false, doneWithoutAsking = false, comment = '', picture, taskTypeId, questId }) {
       if (!taskTypeId || !questId) throw new Error('taskType and quest are required')
       const fv = Number(finalValue ?? value) || 0
       if (picture) {
@@ -19,7 +19,6 @@ export function tasksApi() {
           })
         } catch {}
         const fd = new FormData()
-        fd.append('description', description ?? '')
         fd.append('finalValue', String(fv))
         fd.append('done', (!!done).toString())
         fd.append('doneWithoutAsking', (!!doneWithoutAsking).toString())
@@ -31,7 +30,6 @@ export function tasksApi() {
         return pb.create(col, fd)
       }
       return pb.create(col, {
-        description: description ?? '',
         finalValue: fv,
         done: !!done,
         doneWithoutAsking: !!doneWithoutAsking,

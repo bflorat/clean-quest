@@ -155,7 +155,6 @@ classDiagram
     string  id
     datetime created
     datetime updated
-    string  description
     string taskType
     float finalValue
     boolean done     

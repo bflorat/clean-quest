@@ -148,10 +148,8 @@ export default function TaskBoard() {
   const add = async (e) => {
     e.preventDefault()
     if (!activeQuest || !activeType) return
-    const typeObj = selectedType
-    const description = typeObj?.taskType || ''
     const val = selectedDefaultValue
-    const created = await api.create({ description, value: val, questId: activeQuest, taskTypeId: activeType, doneWithoutAsking: newDoneWA, done: true, finalValue: val, comment: commentText, picture: pictureFile })
+    const created = await api.create({ value: val, questId: activeQuest, taskTypeId: activeType, doneWithoutAsking: newDoneWA, done: true, finalValue: val, comment: commentText, picture: pictureFile })
     setTasks((t) => [created, ...t])
     setNewDoneWA(false)
     setCommentText('')
@@ -254,13 +252,14 @@ export default function TaskBoard() {
         <ul className="board__list">
           {tasks.map((task) => {
             const tt = types.find(tt => tt.id === task.taskType)
+            const displayName = tt?.taskType || task.description || ''
             const tvForDelete = taskValue(task)
             const deletable = canDeleteTask(task, { isAdmin: false })
             return (
             <li key={task.id} className={task.done ? 'done glow' : ''}>
               <label className="task">
                 <div>
-                  <div className="task__name" title={(task.done && task.comment) ? task.comment : (tt?.comment || tt?.taskType || '')}>{task.description}</div>
+                  <div className="task__name" title={(task.done && task.comment) ? task.comment : (tt?.comment || tt?.taskType || '')}>{displayName}</div>
                   <div className="task__date muted">{fmtDateTime(task.created)}</div>
                 </div>
                 {(() => {
@@ -313,7 +312,7 @@ export default function TaskBoard() {
                 )})()}
               </label>
               <div className="task__actions">
-                <button className="link danger" onClick={() => remove(task.id)} aria-label={`${t('task.delete')} ${task.description}`} disabled={!deletable} title={!deletable ? t('task.cannotDeletePenalty') : t('task.delete')}>
+                <button className="link danger" onClick={() => remove(task.id)} aria-label={`${t('task.delete')} ${displayName}`} disabled={!deletable} title={!deletable ? t('task.cannotDeletePenalty') : t('task.delete')}>
                   {t('task.delete')}
                 </button>
               </div>
