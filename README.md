@@ -117,6 +117,11 @@ mkdir -p pb_data
 sudo chown -R $(id -u):$(id -g) pb_data
 ```
 
+Development URLs:
+
+* GUI : http://localhost:5173/
+* PocketBase GUI : http://127.0.0.1:8090/_
+
 ### Migrations (PocketBase)
 
 PocketBase migration scripts live in `pb_migrations/` and are copied into the image at `/pb/pb_migrations`.
