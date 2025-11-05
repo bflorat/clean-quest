@@ -5,6 +5,7 @@ import { useAuth } from './auth/AuthContext.jsx'
 import { userAvatarUrl, pb } from './services/pb.js'
 import { useI18n } from './i18n/I18nProvider.jsx'
 import LangSwitcher from './components/LangSwitcher.jsx'
+import ThemeToggle from './components/ThemeToggle.jsx'
 import './App.css'
 
 export default function App() {
@@ -107,6 +108,7 @@ export default function App() {
         <small>Copyright (C) 2025, Bertrand Florat</small>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           {version ? <small className="muted" title="App version">v{version}</small> : null}
+          <ThemeToggle />
           <LangSwitcher />
         </div>
       </footer>
