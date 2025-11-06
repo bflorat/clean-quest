@@ -35,6 +35,7 @@ Then, create the  database tables with :
 - Task value fallback: when a task `finalValue` (or `value`) is missing or equal to 0, the UI uses its associated task type `defaultValue` for display and for the Estimated Money total.
 - Rules fallback: when the current quest has an empty `rules` field, the UI looks back through previous quests (sorted by start date descending) and shows the first non‑empty `rules` it finds. If none exist, it displays “No rules yet.”
 - Deletion protection: regular users cannot delete tasks whose effective value is negative (penalties). Only admins can delete negative‑valued tasks. The backend enforces this via the tasks deleteRule, and the UI disables the delete action accordingly.
+ - Without asking bonus: when adding a task with “Sans demander” enabled, `finalValue` is persisted as the base value plus 1 (only applied to non‑negative base values).
 
 ### Units for task values
 

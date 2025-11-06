@@ -9,7 +9,11 @@ export function tasksApi() {
     },
     async create({ value = 1, finalValue, done = false, doneWithoutAsking = false, comment = '', picture, taskTypeId, questId }) {
       if (!taskTypeId || !questId) throw new Error('taskType and quest are required')
-      const fv = Number(finalValue ?? value) || 0
+      // Compute persisted finalValue, adding +1 bonus when doneWithoutAsking.
+      // Bonus is applied only to non‑negative base values.
+      const base = Number(finalValue ?? value)
+      let fv = Number.isFinite(base) ? base : 0
+      if (doneWithoutAsking && fv >= 0) fv += 1
       if (picture) {
         try {
           console.debug('[tasksApi] picture:', {
