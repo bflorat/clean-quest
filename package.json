@@ -1,7 +1,7 @@
 {
   "name": "clean-quest",
   "private": true,
-  "version": "10.0",
+  "version": "10.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -25,4 +25,3 @@
     "vitest": "*"
   }
 }
-
