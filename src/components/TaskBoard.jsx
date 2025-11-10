@@ -193,6 +193,9 @@ export default function TaskBoard() {
           <input type="checkbox" checked={newDoneWA} onChange={(e) => setNewDoneWA(e.target.checked)} disabled={disableWithoutAsking || !activeQuest || !activeType} />
           <span className="muted" style={{ fontSize: 12 }}>{t('task.withoutAsking')}</span>
         </label>
+        {selectedType?.comment ? (
+          <div className="board__typeHint">{selectedType.comment}</div>
+        ) : null}
         <div className="board__comment">
           <input
             className="comment-input"
@@ -262,6 +265,8 @@ export default function TaskBoard() {
                   <div className="task__name" title={(task.done && task.comment) ? task.comment : (tt?.comment || tt?.taskType || '')}>{displayName}</div>
                   {task.comment ? (
                     <div className="task__comment muted">({task.comment})</div>
+                  ) : tt?.comment ? (
+                    <div className="task__comment muted">({tt.comment})</div>
                   ) : null}
                   <div className="task__date muted">{fmtDateTime(task.created)}</div>
                 </div>
@@ -330,6 +335,7 @@ export default function TaskBoard() {
           </div>
         </div>
       ) : null}
+
     </section>
   )
 }

@@ -52,7 +52,10 @@ export default function TaskTypeSelect({ types, value, onChange, disabled }) {
               onMouseDown={(e) => { e.preventDefault(); select(t.id) }}
               title={t.comment || t.taskType}
             >
-              {t.taskType}
+              <span className="select__optionTitle">{t.taskType}</span>
+              {t.comment ? (
+                <span className="select__optionDesc">{t.comment}</span>
+              ) : null}
             </div>
           ))}
         </div>
