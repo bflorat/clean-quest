@@ -186,6 +186,16 @@ migrate((db) => {
       }),
       new SchemaField({
         system: false,
+        id: 'p_amount',
+        name: 'amount',
+        type: 'number',
+        required: true,
+        unique: false,
+        presentable: true,
+        options: { min: 0, max: null, noDecimal: false }
+      }),
+      new SchemaField({
+        system: false,
         id: 'p_comment',
         name: 'comment',
         type: 'text',

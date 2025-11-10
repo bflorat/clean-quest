@@ -177,6 +177,7 @@ classDiagram
     %% null while payment waiting 
     dateTime datePayment 
     string comment
+    float amount
   }
 
   class Quest {
