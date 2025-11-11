@@ -2,6 +2,8 @@
 
 Turn chores into a game: reward your kids with XP or cash.
 
+![Screenshot](screenshot.png)
+
 ## Stack
 
 React app scaffolded with Vite and Vitest. Uses PocketBase as the backend (required).
