@@ -2,7 +2,7 @@
 
 Turn chores into a game: reward your kids with XP or cash.
 
-![Screenshot](screenshot.png){width=320px height=200px}
+<img src="screenshot.png" alt="Screenshot" width="150">
 
 ## Stack
 
