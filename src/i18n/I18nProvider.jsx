@@ -34,6 +34,7 @@ const messages = {
     task: {
       bonus: 'Bonus',
       bonusTitle: 'Bonus if done without asking',
+      confirmDelete: 'Delete this task?',
       delete: 'Delete',
       withoutAsking: 'Without asking',
       penalty: 'Penalty',
@@ -80,6 +81,7 @@ const messages = {
     task: {
       bonus: 'Bonus',
       bonusTitle: 'Bonus si réalisée sans qu’on te le demande',
+      confirmDelete: 'Supprimer cette tâche ?',
       delete: 'Supprimer',
       withoutAsking: 'Sans demander',
       penalty: 'Pénalité',

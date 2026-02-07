@@ -168,9 +168,13 @@ export default function TaskBoard() {
     setTasks(list => list.map(t => t.id === id ? updated : t))
   }
 
-  const remove = async (id) => {
-    await api.remove(id)
-    setTasks(list => list.filter(t => t.id !== id))
+  const remove = async (task, displayName = '') => {
+    const confirmText = displayName
+      ? `${t('task.confirmDelete')}\n${displayName}`
+      : t('task.confirmDelete')
+    if (!window.confirm(confirmText)) return
+    await api.remove(task.id)
+    setTasks(list => list.filter(t => t.id !== task.id))
   }
 
   // const doneCount = tasks.filter(t => t.done).length
@@ -319,7 +323,7 @@ export default function TaskBoard() {
                 )})()}
               </label>
               <div className="task__actions">
-                <button className="link danger" onClick={() => remove(task.id)} aria-label={`${t('task.delete')} ${displayName}`} disabled={!deletable} title={!deletable ? t('task.cannotDeletePenalty') : t('task.delete')}>
+                <button className="link danger" onClick={() => remove(task, displayName)} aria-label={`${t('task.delete')} ${displayName}`} disabled={!deletable} title={!deletable ? t('task.cannotDeletePenalty') : t('task.delete')}>
                   {t('task.delete')}
                 </button>
               </div>
