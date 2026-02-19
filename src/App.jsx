@@ -105,7 +105,7 @@ export default function App() {
         )}
       </main>
       <footer className="app__footer">
-        <small>Copyright (C) 2025, Bertrand Florat</small>
+        <small>Copyright (C) 2025-2026, Bertrand Florat</small>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           {version ? <small className="muted" title="App version">v{version}</small> : null}
           <ThemeToggle />
