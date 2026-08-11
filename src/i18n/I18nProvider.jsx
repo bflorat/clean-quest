@@ -24,11 +24,15 @@ const messages = {
     rules: { title: 'Rules', view: 'View rules', link: 'Rules', empty: 'No rules yet.' },
     board: {
       currentQuest: 'Current Quest',
+      previousQuest: 'Previous Quest',
+      viewQuest: 'View quest: ',
+      readOnly: 'Read-only',
       noActiveQuest: 'No quest active now. Create one covering the current date in PocketBase.',
       taskType: 'Task Type',
       placeholderAdd: 'Add a task (e.g., Dishes)',
       addNewTask: 'Add a new task',
-      noTasksYet: 'No tasks yet. Add your first task!'
+      noTasksYet: 'No tasks yet. Add your first task!',
+      noTasksInQuest: 'No tasks in this quest.'
     },
     task: {
       bonus: 'Bonus',
@@ -70,11 +74,15 @@ const messages = {
     rules: { title: 'Règles', view: 'Voir les règles', link: 'Règles', empty: 'Aucune règle pour le moment.' },
     board: {
       currentQuest: 'Quête en cours',
+      previousQuest: 'Quête précédente',
+      viewQuest: 'Voir une quête',
+      readOnly: 'Lecture seule',
       noActiveQuest: 'Aucune quête active. Crée une quête couvrant la date actuelle dans PocketBase.',
       taskType: 'Type de tâche',
       placeholderAdd: 'Ajouter une tâche (ex. Vaisselle)',
       addNewTask: 'Ajouter une nouvelle tâche',
-      noTasksYet: 'Aucune tâche. Ajoute ta première tâche !'
+      noTasksYet: 'Aucune tâche. Ajoute ta première tâche !',
+      noTasksInQuest: 'Aucune tâche dans cette quête.'
     },
     task: {
       bonus: 'Bonus',

@@ -12,6 +12,17 @@ import { canDeleteTask } from '../lib/taskPolicy.js'
 import TaskTypeSelect from './TaskTypeSelect.jsx'
 import { fileUrl } from '../services/pb.js'
 
+function isQuestActive(quest, now = Date.now()) {
+  const start = quest?.start ? new Date(quest.start).getTime() : NaN
+  const end = quest?.end ? new Date(quest.end).getTime() : NaN
+  return Number.isFinite(start) && start <= now && (!Number.isFinite(end) || end >= now)
+}
+
+function isPreviousQuest(quest, now = Date.now()) {
+  const end = quest?.end ? new Date(quest.end).getTime() : NaN
+  return Number.isFinite(end) && end < now
+}
+
 export default function TaskBoard() {
   const api = useMemo(() => tasksApi(), [])
   const { success } = useSound()
@@ -99,17 +110,12 @@ export default function TaskBoard() {
       const [qs, ts] = await Promise.all([listQuests(user?.id), listTaskTypes()])
       if (qs.length) {
         setQuests(qs)
-        // pick current quest: start <= now <= end (or no end)
-        const now = new Date()
-        const current = qs.find(q => {
-          const start = q.start ? new Date(q.start) : null
-          const end = q.end ? new Date(q.end) : null
-          if (!start) return false
-          if (start > now) return false
-          if (end && end < now) return false
-          return true
-        })
-        setActiveQuest(current ? current.id : '')
+        const now = Date.now()
+        const current = qs.find((q) => isQuestActive(q, now))
+        const mostRecentPrevious = qs
+          .filter((q) => isPreviousQuest(q, now))
+          .sort((a, b) => new Date(b.end) - new Date(a.end))[0]
+        setActiveQuest(current?.id || mostRecentPrevious?.id || '')
       } else {
         setActiveQuest('')
       }
@@ -147,7 +153,7 @@ export default function TaskBoard() {
 
   const add = async (e) => {
     e.preventDefault()
-    if (!activeQuest || !activeType) return
+    if (isReadOnly || !activeQuest || !activeType) return
     const val = selectedDefaultValue
     const created = await api.create({ value: val, questId: activeQuest, taskTypeId: activeType, doneWithoutAsking: newDoneWA, done: true, finalValue: val, comment: commentText, picture: pictureFile })
     setTasks((t) => [created, ...t])
@@ -169,6 +175,7 @@ export default function TaskBoard() {
   }
 
   const remove = async (task, displayName = '') => {
+    if (isReadOnly) return
     const confirmText = displayName
       ? `${t('task.confirmDelete')}\n${displayName}`
       : t('task.confirmDelete')
@@ -179,6 +186,13 @@ export default function TaskBoard() {
 
   // const doneCount = tasks.filter(t => t.done).length
   const currentQuest = quests.find(q => q.id === activeQuest)
+  const isReadOnly = Boolean(currentQuest && !isQuestActive(currentQuest))
+  const viewableQuests = useMemo(() => {
+    const now = Date.now()
+    return quests
+      .filter((quest) => isQuestActive(quest, now) || isPreviousQuest(quest, now))
+      .sort((a, b) => new Date(b.start || 0) - new Date(a.start || 0))
+  }, [quests])
 
   return (
     <section className="board">
@@ -187,10 +201,10 @@ export default function TaskBoard() {
       {/* Removed duplicate Current Quest pane to keep only HUD */}
 
       {activeQuest && tasks.length === 0 ? (
-        <p className="muted">{t('board.noTasksYet')}</p>
+        <p className="muted">{isReadOnly ? t('board.noTasksInQuest') : t('board.noTasksYet')}</p>
       ) : null}
 
-      <form className="board__form" onSubmit={add} aria-label="add-task">
+      {!isReadOnly ? <form className="board__form" onSubmit={add} aria-label="add-task">
         <div className="board__formTitle">{t('board.addNewTask')}</div>
         <TaskTypeSelect types={types} value={activeType} onChange={setActiveType} disabled={!activeQuest} />
         <label className="form-toggle" title={t('task.bonusTitle')}>
@@ -237,7 +251,7 @@ export default function TaskBoard() {
             <span className="btn-icon">➕</span> {t('actions.add')}
           </button>
         </div>
-      </form>
+      </form> : null}
 
       {tasksLoading ? (
         <ul className="board__list" aria-busy="true" aria-live="polite">
@@ -321,13 +335,26 @@ export default function TaskBoard() {
                 )})()}
               </label>
               <div className="task__actions">
-                <button className="link danger" onClick={() => remove(task, displayName)} aria-label={`${t('task.delete')} ${displayName}`} disabled={!deletable} title={!deletable ? t('task.cannotDeletePenalty') : t('task.delete')}>
+                <button className="link danger" onClick={() => remove(task, displayName)} aria-label={`${t('task.delete')} ${displayName}`} disabled={isReadOnly || !deletable} title={isReadOnly ? t('board.readOnly') : !deletable ? t('task.cannotDeletePenalty') : t('task.delete')}>
                   {t('task.delete')}
                 </button>
               </div>
             </li>
           )})}
         </ul>
+      ) : null}
+      {viewableQuests.length > 0 ? (
+        <label className="board__questPicker">
+          <span>{t('board.viewQuest')}</span>
+          <select value={activeQuest} onChange={(e) => setActiveQuest(e.target.value)}>
+            {viewableQuests.map((quest) => (
+              <option key={quest.id} value={quest.id}>
+                {isQuestActive(quest) ? t('board.currentQuest') : t('board.previousQuest')} — {fmtDateTime(quest.start)}
+              </option>
+            ))}
+          </select>
+          {isReadOnly ? <span className="board__readOnly">{t('board.readOnly')}</span> : null}
+        </label>
       ) : null}
       {previewSrc ? (
         <div className="lightboxBackdrop" onClick={() => setPreviewSrc('')}>
