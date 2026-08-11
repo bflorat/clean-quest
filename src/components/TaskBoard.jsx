@@ -239,9 +239,7 @@ export default function TaskBoard() {
         </div>
       </form>
 
-      {(!activeQuest) ? (
-        <p className="muted">{t('board.tipCreate')}</p>
-      ) : tasksLoading ? (
+      {tasksLoading ? (
         <ul className="board__list" aria-busy="true" aria-live="polite">
           <li className="done">
             <label className="task">
